@@ -40,6 +40,7 @@ const [selectedBook, setSelectedBook] = useState(null)
 const [showAddForm, setShowAddForm] = useState(false)
 const [newTitle, setNewTitle] = useState('')
 const [newAuthor, setNewAuthor] = useState('')
+const [newCoverUrl, setNewCoverUrl] = useState('')
 const [searchResults, setSearchResults] = useState([])
 const [newStatus, setNewStatus] = useState('読書中')
 const [showEditForm, setShowEditForm] = useState(false)
@@ -71,7 +72,7 @@ const addBook = async () => {
     alert('本のタイトルを入力してください')
     return
   }
-const coverUrl = await getBookCover(newTitle, newAuthor)
+const coverUrl = newCoverUrl
   const newBook = {
     id: Date.now(),
     title: newTitle,
@@ -88,6 +89,7 @@ const coverUrl = await getBookCover(newTitle, newAuthor)
 
   setNewTitle('')
   setNewAuthor('')
+  setNewCoverUrl('')
   setNewStatus('読書中')
   setShowAddForm(false)
 }
@@ -241,10 +243,18 @@ const setRating = (rating) => {
 </button>
 <div className="search-results">
   {searchResults.map((book) => (
-    <div
-      className="search-book"
-      key={book.key}
-    >
+   <div
+  className="search-book"
+  key={book.key}
+  onClick={() => {
+    setNewTitle(book.title)
+    setNewAuthor(book.author_name?.[0] || '')
+    setNewCoverUrl(
+      `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg`
+    )
+    setSearchResults([])
+  }}
+>
       {book.cover_i && (
         <img
           src={`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`}

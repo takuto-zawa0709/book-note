@@ -152,3 +152,27 @@ textarea {
   object-fit: cover;
   border-radius: 6px;
 }
+.search-results {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  margin: 15px 0;
+}
+
+.search-book {
+  width: 100px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.search-book img {
+  width: 100px;
+  height: 145px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.search-book p {
+  font-size: 12px;
+  margin-top: 5px;
+}
