@@ -176,3 +176,8 @@ textarea {
   font-size: 12px;
   margin-top: 5px;
 }
+.search-book {
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}

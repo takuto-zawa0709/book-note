@@ -246,6 +246,7 @@ const setRating = (rating) => {
    <div
   className="search-book"
   key={book.key}
+  role="button"
   onClick={() => {
     setNewTitle(book.title)
     setNewAuthor(book.author_name?.[0] || '')
