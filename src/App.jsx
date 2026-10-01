@@ -48,22 +48,56 @@ const [editTitle, setEditTitle] = useState('')
 const [editAuthor, setEditAuthor] = useState('')
 const [editStatus, setEditStatus] = useState('読書中')
 const [editFinishedDate, setEditFinishedDate] = useState('')
+
 const searchBooks = async () => {
   if (!newTitle.trim()) {
     return
   }
 
-  const url = `https://openlibrary.org/search.json?title=${encodeURIComponent(newTitle)}&limit=20`
+  try {
+    const appId = import.meta.env.VITE_RAKUTEN_APP_ID
+    const accessKey = import.meta.env.VITE_RAKUTEN_ACCESS_KEY
 
-  const response = await fetch(url)
-  const data = await response.json()
+    const url =
+  `https://openapi.rakuten.co.jp/services/api/BooksBook/Search/20170404` +
+  `?format=json` +
+  `&title=${encodeURIComponent(newTitle)}` +
+  `&applicationId=${encodeURIComponent(appId)}` +
+  `&accessKey=${encodeURIComponent(accessKey)}`
 
- setSearchResults(
-  (data.docs || [])
-    .filter((book) => book.cover_i)
-    .slice(0, 5)
-)
+const response = await fetch(url)
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('楽天APIエラー:', response.status, errorText)
+      setSearchResults([])
+      return
+    }
+
+    const data = await response.json()
+
+    const books = (data.Items || []).map((result) => {
+      const book = result.Item
+
+      return {
+        key: book.isbn,
+        title: book.title,
+        author_name: [book.author || '著者不明'],
+        isbn: book.isbn,
+        coverUrl:
+          book.largeImageUrl ||
+          book.mediumImageUrl ||
+          book.smallImageUrl ||
+          ''
+      }
+    })
+
+    setSearchResults(books)
+  } catch (error) {
+    console.error('楽天ブックス検索エラー:', error)
+    setSearchResults([])
+  }
 }
+
 useEffect(() => {
   localStorage.setItem('books', JSON.stringify(books))
 }, [books])
@@ -251,14 +285,20 @@ const setRating = (rating) => {
     setNewTitle(book.title)
     setNewAuthor(book.author_name?.[0] || '')
     setNewCoverUrl(
-      `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg`
-    )
+  book.coverUrl ||
+  (book.cover_i
+    ? `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg`
+    : '')
+)
     setSearchResults([])
   }}
 >
-      {book.cover_i && (
+     {(book.coverUrl || book.cover_i) && (
         <img
-          src={`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`}
+          src={
+  book.coverUrl ||
+  `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
+}
           alt={book.title}
         />
       )}
